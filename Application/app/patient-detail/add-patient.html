@@ -1,0 +1,6 @@
+<div class="panel panel-default" *ngIf="patient">
+  <div class="panel-body">
+  	 <span class="badge">{{patient.id}}</span> {{patient.name}}
+  </div>
+  <a (click)="goBack()" >back</a>
+</div>

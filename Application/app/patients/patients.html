@@ -1,0 +1,6 @@
+<div class="panel panel-default">
+  <div class="panel-body">
+  	<button class="btn btn-primary col-xs-3" (click)="goBack()"> Go Back </button>
+  	<ag-grid-ng2 #gapp class="ag-dark col-xs-12" [gridOptions]="gridOptions" [columnDefs]="columnDefs" [rowData]="patients" enableSorting="true" enableColResize="true" enableFilter="true" (rowClicked)='gotoDetail($event)'></ag-grid-ng2>
+  </div>
+</div>
