@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { CookieService } from 'angular2-cookie/core';
 import { Patient } from './patient';
+import { User } from 'app/user/user';
 import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/Rx';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -15,6 +17,8 @@ export class PatientService {
      // private instance variable to hold base url
      private patientsUrl = 'http://localhost:8000/patients'; 
      private header = {headers:{}};
+     private isLoginSuccess : Boolen = false;
+     loginSuccess:BehaviorSubject = new BehaviorSubject(null);
 
 	authenticate() : void{
 		this.header.headers['x-access-token'] = this.cookieService.get('gscc-token');
@@ -51,12 +55,21 @@ export class PatientService {
 		return res;
 	}
 
+	logoffUser(): void{
+		this.cookieService.put('gscc-token', null);
+		this.header.headers['x-access-token'] = null;
+		this.isLoginSuccess = false;
+		this.loginSuccess.next(null);
+		this.router.navigate(['/login']);
+	}
+
 	private extractData(res: Response) {
 		let body = res.json();
 		if(body && body.status != null){
 			switch(body.status){
+				case 3:
 				case 4:{
-					this.router.navigate(['/login']);
+					this.logoffUser();
 					break;
 				}
 				case 0:{
@@ -64,7 +77,15 @@ export class PatientService {
 					expiryDate.setDate(expiryDate.getDate() + 30);
 					this.cookieService.put('gscc-token', body.token, {expires:expiryDate});
 					this.header.headers['x-access-token'] = body.token;
+					this.loginSuccess.next(body.user);
+					this.isLoginSuccess = true;
 					break;
+				}
+				case 5:{
+					if(this.isLoginSuccess === false){
+						this.loginSuccess.next(body.user);
+						this.isLoginSuccess = true;
+					}
 				}
 			}
 		}

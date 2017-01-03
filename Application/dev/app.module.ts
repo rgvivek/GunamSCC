@@ -7,6 +7,7 @@ import { AgGridModule } from 'ag-grid-ng2/main';
 import { routing }        from './app.routing';
 
 import { AppComponent }  from './app.component';
+import { PatientService } from './patient/patient.service';
 import { HeaderComponent }  from './common/header/header.component';
 import { FooterComponent }  from './common/footer/footer.component';
 import { LoginComponent }  from './login/login.component';
@@ -15,7 +16,7 @@ import { MainComponent }  from './main/main.component';
 import { PatientsComponent }  from './patients/patients.component';
 import { PatientDetailComponent }  from './patient-detail/patient-detail.component';
 import { AddPatientComponent }  from './add-patient/add-patient.component';
-import { PatientService } from './patient/patient.service';
+import { UserService } from './user/user.service';
 
 @NgModule({
   imports: [ 
@@ -37,7 +38,7 @@ import { PatientService } from './patient/patient.service';
   	PatientDetailComponent,
     AddPatientComponent
   ],
-  providers: [PatientService, CookieService ],
+  providers: [PatientService, UserService, CookieService ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }

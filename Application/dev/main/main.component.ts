@@ -6,8 +6,16 @@ import { PatientService } from 'app/patient/patient.service';
     selector: 'nsf-main',
     templateUrl:"app/main/main.html"
 })
-export class MainComponent {
-	constructor(private patientService: PatientService, private router: Router) { };
+export class MainComponent implements OnInit{
+	constructor(private patientService: PatientService, private router: Router) {
+		this.patientService.loginSuccess.subscribe(this.setView.bind(this));
+	};
+	
+	private isAdminView : boolean = false;
+	private setView(user: User) {
+		this.isAdminView = user && user.isadmin;
+	} 
+
 	goToPatients(): void {
 	  let link = ['/patients'];
 	  this.router.navigate(link);

@@ -6,7 +6,17 @@ module.exports = {
   configure: function(app, passport) {
     
     app.post('/authenticate', isLoggedIn, function(req, res, next) {
-      res.send({status: 5, message: 'Login Successful'}); 
+      var userId = req.decoded.id;
+      console.log("userid" + req.decoded.id);
+      var adminUser = new User();
+      adminUser.findById( userId, function(err, user) {
+        console.log("userid" + JSON.stringify(user));
+        if (err || !user){
+          res.send({status: 4, message: 'Session timeout. Re-login'});
+        }else{
+          res.send({status: 5, message: 'User session valid', user : user});
+        } 
+      });
     });
 
     app.post('/signUp', isLoggedIn, function(req, res, next) {
@@ -14,7 +24,6 @@ module.exports = {
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-access-token");
       var username = req.body.username;
       var password = req.body.password;
-      //console.log("new user is " + JSON.stringify(req.data));
       var adminUser = new User();
       adminUser.findOne({ 'username' :  username }, function(err, user) {
           if (err){
@@ -25,14 +34,16 @@ module.exports = {
           } else {
             var newUser            = new User();
             newUser.username    = username;
-            newUser.name    = username;
+            newUser.firstname    = req.body.firstname;
+            newUser.lastname    = req.body.lastname;
+            newUser.isAdmin    = req.body.isAdmin;
             newUser.password = newUser.generateHash(password);
 
             adminUser.save(newUser, function(err) {
                 if (err){
                   res.send({status: 1, message: err}); 
                 }
-                res.send({status: 2, message: 'signup successful'});
+                res.send({status: 6, message: 'signup successful'});
             });
           }
         });
@@ -59,7 +70,7 @@ module.exports = {
           var token = jwt.sign(user, app.get('superSecret'), {
             expiresIn : 1440 // expires in 24 hours
           });
-          res.send({status: 0, message: 'Login Successful', token: token}); 
+          res.send({status: 0, message: 'Login Successful', token: token, user : user}); 
         }else{
           res.send({status: 3, message: 'Login Failed. Please verify the Username/Password'});
         }
